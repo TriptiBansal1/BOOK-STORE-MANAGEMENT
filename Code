@@ -1,0 +1,470 @@
+import mysql.connector
+import datetime
+import re
+mydb=mysql.connector.connect(host=
+"localhost"
+,user=
+"root"
+,password=
+"abc 123")
+#Function definitions
+def a1():
+#ADD BOOKS
+print("\nAll information prompted are mandatory to be filled")
+book=(input("Enter Book Name:"))
+mycursor.execute("select * from Available_Books where
+bookname=
+'"+book+"'")
+row=mycursor.fetchone()
+ifrow is not None:
+    print("This book is already in stock. You can only update the
+quantity forthis")
+quantity=(input("Enter quantity to be added:"))
+if not re.match("[1,2,3,4,5,6,7,8,9,0]"
+,quantity):
+print('\nError: Qty. can take only numbers.Kindly try again\n')
+a1()
+mycursor.execute("update Available_Books set
+quantity=quantity+'"+str(quantity)+"' where bookname=
+'"+book+"'")
+mydb.commit()
+print(quantity,
+" new books have been added to the previous
+stock.\n")
+else:
+genre=str(input("Genre:"))
+quantity=(input("Enter quantity:"))
+if not re.match("[1,2,3,4,5,6,7,8,9,0]"
+,quantity):
+print('\nError: Qty. can take only numbers.Kindly try again\n')
+a1()
+author=str(input("Enter author name:"))
+if not re.match("[a-z]"
+,author):
+print('\nError: Wrong input,only alphabets allowed.Kindly try
+again\n')
+a1()
+publication=str(input("Enter publication house:"))
+price=(input("Enterthe price:"))
+if not re.match("[1,2,3,4,5,6,7,8,9,0]"
+,price):
+print('\nError:Price can take only numbers.Kindly try again\n')
+a1()
+mycursor.execute("insert into
+Available_Books(bookname,genre,quantity,author,publication,price,usern
+ame)
+values('"+book+"'
+,
+'"+genre+"'
+,
+'"+str(quantity)+"'
+,
+'"+author+"'
+,
+'"+publication+"'
+,
+'"+
+str(price)+"'
+,
+'"+username+"')")
+mydb.commit()
+print("\n++BOOK SUCCESSFULLY ADDED++\n")
+def a2():
+#BOOKS SOLD TO CUSTOMER
+print("\nAVAILABLE BOOKS IN STOCK...")
+print("Bookname,Genre,Quantity,Author,Publication,Price,
+Username admin")
+mycursor.execute("select * from Available_Books ")
+for x in mycursor:
+print(x)
+print('')
+cusname=str(input("Enter customer name:"))
+if not re.match("[a-z]"
+,cusname):
+print('\nError:Only alphabets allowed.Kindly try again\n')
+a2()
+phno=(input("Enter phone number:"))
+if not re.match("[1,2,3,4,5,6,7,8,9,0]"
+,phno):
+print('\nError: Phone number can take only numbers.Kindly try
+again\n')
+a2()
+book=(input("Enter Book Name:"))
+price=(input("Enterthe price:"))
+if not re.match("[1,2,3,4,5,6,7,8,9,0]"
+,price):
+print('\nError: Price can take only numbers.Kindly try again\n')
+a2()
+n=int(input("Enter quantity:"))
+mycursor.execute("select bookname from available_books where
+bookname=
+'"+book+"'")
+log=mycursor.fetchone()
+if log is not None:
+mycursor.execute("select quantity from available_books where
+bookname=
+'"+book+"'")
+lk=mycursor.fetchone()
+if max(lk)<n:
+print(n,
+" books are not available in stock. Only qty abl. "
+,lk)
+else:
+mycursor.execute("insert into Sell_rec
+values('"+cusname+"'
+,
+'"+str(phno)+"'
+,
+'"+book+"'
+,
+'"+str(n)+"'
+,
+'"+str(price)+"'
+,
+'"+us
+ername+"')")
+mycursor.execute("update Available_Books set
+quantity=quantity-'"+str(n)+"' where BookName=
+'"+book+"'")
+mydb.commit()
+f5=open("Customer_Invoice.txt"
+,
+'w')
+f5.write("++Pakhi N Anisha N Arham Book Depot++\n\n")
+f5.writelines(["Customer Name : "
+,cusname,
+'\n'])
+f5.writelines(["Mobile No. :"
+,str(phno),
+'\n'])
+f5.writelines(["BookName: "
+,book,
+'\n'])
+f5.writelines(["Qty.: "
+,str(n),
+'\n'])
+f5.writelines(["Price: "
+,str(price),
+'\n'])
+now = datetime.datetime.now()
+f5.writelines(['Purchase on:
+'
+,now.strftime("%Y-%m-%d %H:%M:%S"),
+'\n'])
+f5.write("\n++THANKYOU FOR SHOPPING WITH US++")
+f5.close()
+print("\n++BOOK HAS BEEN SOLD++")
+print("++CUSTOMER BILL REPORT GENERATED IN PROGRAM
+FOLDER AS A FILE NAMED 'CustomerInvoice'++")
+else:
+print("\nBOOK IS NOT AVAILABLE IN STOCK")
+def a3():
+    #SEARCH BOOKS ON THE BASIS OF GIVEN OPTIONS
+print("""1:Search by name
+2:Search similar books
+3:Search by genre
+4:Search by author""")
+l=(input("Search by?:"))
+#BY BOOKNAME
+if l==
+'1':
+o=input("\nEnter Book to search:")
+mycursor.execute("select bookname from available_books
+where bookname=
+'"+o+"'")
+tree=mycursor.fetchone()
+if tree!=None:
+print("\nBOOK IS IN STOCK\n")
+else:
+print("\nBOOK IS NOT IN STOCK\n")
+#BY SIMILAR NAME
+if l==
+'2':
+o=input("\nEnter Book to search:")
+print('\nHere are books matching your search...\n')
+mycursor.execute("select bookname from available_books
+where bookname like '"+o+"%'")
+for ik in mycursor:
+print(ik)
+print('')
+#BY GENRE
+elif l==
+'3':
+    g=input("\nEnter genre to search:")
+print('\nHere are books matching your search...\n')
+mycursor.execute("select * from available_books where
+genre=
+'"+g+"'")
+for gen in mycursor:
+print(gen)
+print('')
+#BY AUTHOR NAME
+elif l==
+'4':
+au=input("\nEnter authorto search:")
+print('\nHere are books matching your search...\n')
+mycursor.execute("select authorfrom available_books
+where author=
+'"+au+"'")
+home=mycursor.fetchall()
+if home is not None:
+mycursor.execute("select * from available_books where
+author=
+'"+au+"'")
+for z in mycursor:
+print(z)
+else:
+print("BOOKS OF THIS AUTHOR ARE NOT
+AVAILABLE\n")
+mydb.commit()
+def a4():
+#SET SALARY CLASS
+print("The current Salary class is as follows")
+mycursor.execute("select*from staff_salary")
+for s in mycursor:
+print(s)
+print("Do you want to update sal_class?")
+www=(input('1 for YES, any number key for NO:'))
+if www==
+'1':
+class1 = (input("Enter new salary_class 1: "))
+if not re.match("[1,2,3,4,5,6,7,8,9,0]"
+,class1):
+print('\nError: INVALID INPUT.Kindly try again\n')
+a4()
+class2 = (input("Enter new salary_class 2: "))
+if not re.match("[1,2,3,4,5,6,7,8,9,0]"
+,class2):
+print('\nError: INVALID INPUT.Kindly try again\n')
+a4()
+class3 = (input("Enter new salary_class 3: "))
+if not re.match("[1,2,3,4,5,6,7,8,9,0]"
+,class3):
+print('\nError: INVALID INPUT.Kindly try again\n')
+a4()
+mycursor.execute("update staff_salary set
+salary=
+'"+str(class1)+"' where sal_class=
+'1'")
+mycursor.execute("update staff_salary set
+salary=
+'"+str(class2)+"' where sal_class=
+'2'")
+mycursor.execute("update staff_salary set
+salary=
+'"+str(class3)+"' where sal_class=
+'3'")
+print("\nSalary class succesfully updated\n")
+mydb.commit()
+else:
+pass
+def a5():
+#STAFF DETAILS
+print("\n1:New staff entry")
+print("2:Remove staff")
+print("3:REPORT of Existing staff details\n")
+ch=(input("Enter your choice:"))
+#NEW STAFF ENTRY
+if ch==
+'1':
+fname=(input("Enter Fullname:"))
+if not re.match("[a-z]"
+,fname):
+print('\nError: INVALID INPUT.Kindly try again\n')
+a5()
+gender=(input("Gender(M/F/O):"))
+if not re.match("[M,F,O]"
+,gender):
+print('\nError: Gender can take only M/F/O.Kindly try
+again\n')
+a5()
+age=(input("Age:"))
+if not re.match("[1,2,3,4,5,6,7,8,9,0]"
+,age):
+print('\nError: Age can take only numbers.Kindly try
+again\n')
+a5()
+phno=(input("Staff phone no.:"))
+if not re.match("[1,2,3,4,5,6,7,8,9,0]"
+,phno):
+print('\nError: Phone number can take only
+numbers.Kindly try again\n')
+a5()
+add=str(input("Address:"))
+print("Default sal_class will be set to 1 if valid input is not
+given")
+salclass=(input("Enter Salary Class(1/2/3):"))
+if not re.match("[1,2,3]"
+,salclass):
+print('\nError:INVALID INPUT.Kindly try again\n')
+a5()
+mycursor.execute("insert into Staff_details
+values('"+fname+"'
+,
+'"+gender+"'
+,
+'"+str(age)+"'
+,
+'"+str(phno)+"'
+,
+'"+add+"'
+,
+'"+userna
+me+"'
+,
+'"+str(salclass)+"')")
+print("""+++++++++++++++++++++++++++++
++STAFF IS SUCCESSFULLY ADDED+
++++++++++++++++++++++++++++++""")
+mydb.commit()
+#REMOVE STAFF
+elif ch==
+'2':
+nm=(input("Enter staff name to remove:"))
+if not re.match("[a-z]"
+,nm):
+print('\nError: INVALID INPUT.Kindly try again\n')
+a5()
+mycursor.execute("select name from staff_details where
+name=
+'"+nm+"'")
+toy=mycursor.fetchone()
+if toy is not None:
+mycursor.execute("delete from staff_details where
+name=
+'"+nm+"'")
+print("\nSTAFF IS SUCCESSFULLY REMOVED\n")
+mydb.commit()
+else:
+print("\nSTAFF DOESNOT EXIST IN DATABASE\n")
+#EXISTING STAFF DETAILS
+elif ch==
+'3':
+f1 = open("Staff_Details.txt"
+,
+'w')
+mycursor.execute("select * from Staff_details")
+f1.write("(Name,gender,age,phno,address,username
+admin,sal_class)\n\n")
+for t in mycursor:
+f1.write(str(t))
+f1.write("\n")
+f1.close()
+print("\nYour report has been successfully generated as
+'Staff_Details' and has been saved in your program folder as a Textfile\n")
+else:
+print('\nError: Kindly add a valid input. Kindly try
+again.\n')
+a5()
+def a6():
+#SELL HISTORY
+print("1:REPORT of Sell history")
+print("2:Reset Sell history")
+ty=int(input("Enter your choice:"))
+if ty==1:
+f2 = open("Sell_History.txt"
+,
+'w')
+mycursor.execute("select * from sell_rec")
+f2.write("(CustomerName,Phno,BookPurchased,Qty,Price,Username admin,
+DateTime)\n\n")
+for u in mycursor:
+now = datetime.datetime.now()
+f2.writelines([str(u),
+'
+,
+'
+,now.strftime("%Y-%m-%d %H:%M:%S")])
+f2.write('\n')
+f2.close()
+print("\nYour report has been successfully generated as
+'Sell_History' and has been saved in your program folder as a Textfile\n")
+if ty==2:
+bb=(input("Are you sure(1 for Yes/any num key for No):"))
+if bb==
+'1':
+mycursor.execute("delete from sell_rec")
+mydb.commit()
+print("Successfully deleted sell history.")
+else:
+print("Erro: INVALID INPUT. TRY AGAIN")
+#CREATING DATABASE AND TABLE
+mycursor=mydb.cursor()
+mycursor.execute("create database if not exists store")
+mycursor.execute("use store")
+mycursor.execute("create table if not exists signup(username varchar(20)
+primary key,password varchar(20))")
+while True:
+print("""1:Signup
+2:Login""")
+ch=(input("SIGNUP/LOGIN(1,2):"))
+#SIGNUP FOR NEW USER
+if ch==
+'1':
+print("")
+username=input("USERNAME:")
+mycursor.execute("select username from signup where
+username=
+'"+username+"'")
+user=mycursor.fetchone()
+if useris not None:
+print("This username is already taken.Account could not be
+created.\n")
+else:
+pw=input("PASSWORD:")
+mycursor.execute("insert into signup
+values('"+username+"'
+,
+'"+pw+"')")
+mydb.commit()
+print("You have been registered successfully. Kindly Login to
+continue.\n")
+#LOGIN FOR EXISTING USER
+elif ch==
+'2':
+print("")
+username=input("USERNAME:")
+mycursor.execute("select username from signup where
+username=
+'"+username+"'")
+pot=mycursor.fetchone()
+if potis not None:
+print("Username matched in database. Kindly enter your password
+to continue.")
+pw=input("PASSWORD:")
+mycursor.execute("select password from signup where
+password=
+'"+pw+"'")
+a=mycursor.fetchone()
+if a is not None:
+print("""\n++++++++++++++++++++++++++ LOGIN SUCCESSFUL
+++++++++++++++++++++++++++""")
+print("""++++++++++++++++++++++++++ Pakhi N Anisha N Arham
+Book Depot +++++++++++++++++++++++++""")
+mycursor.execute("create table if not exists
+Available_Books(BookName varchar(30) primary key,Genre
+varchar(20),Quantity int,Author varchar(20),Publication varchar(30),Price
+int,username varchar(20), foreign key (username) references
+signup(username))")
+mycursor.execute("create table if not exists
+Sell_rec(CustomerName varchar(20),PhoneNumber char(10) unique key,
+BookName varchar(30),Quantity int,Price int,username
+varchar(20),foreign key (BookName) references
+Available_Books(BookName),foreign key(username) references
+signup(username))")
+mycursor.execute("create table if not exists
+Staff_salary(sal_class int primary key, salary int default'5000')")
+mycursor.execute("create table if not exists Staff_details(Name
+varchar(30), Gender varchar(10),Age int, PhoneNumber char(10) unique
+key , Address varchar(40),username varchar(20),sal_class int,foreign
+key(username) references signup(username),foreign key(sal_class)
+references staff_salary(sal_class))")
+mycursor.execute("insert ignore into staff_salary
+values(1,DEFAULT)")
+mycursor.execute("insert ignore into staff_salary
+values(2,DEFAULT)")
+mycursor.execute("insert ignore into staff_salary
+values(3,DEFAULT)")
+mydb.commit()
+while(True):
+    print(""")
